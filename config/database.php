@@ -1,8 +1,12 @@
 <?php
-// deklarasi parameter koneksi database
-$sql_details = array(
-    'user' => 'root',                               // username database, default “root”
-    'pass' => '',                                   // password database, default kosong
-    'db'   => 'db_crud_jquery_ajax',                // nama database yang akan digunakan
-    'host' => 'localhost'                           // server database, default “localhost” atau “127.0.0.1”
-);
+// Deklarasi strict types
+declare(strict_types=1);
+
+// Konfigurasi database
+$sql_details = [
+    'user' => 'root',
+    'pass' => '',
+    'db'   => 'db_crud_jquery_ajax',
+    'host' => 'localhost',
+    'charset' => 'utf8'
+];

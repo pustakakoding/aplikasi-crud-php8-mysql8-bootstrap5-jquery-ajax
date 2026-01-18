@@ -5,7 +5,7 @@ body {
 }
 
 .bg-primary {
-    background-color: #6861ce !important;
+    background-color: #615fff !important;
 }
 
 .icon-title {
@@ -24,7 +24,7 @@ body {
 }
 
 .breadcrumb .breadcrumb-item a:hover {
-    color: #6861ce !important;
+    color: #615fff !important;
     text-decoration: none;
 }
 
@@ -34,19 +34,19 @@ body {
 
 .btn-primary {
     --bs-btn-color: #fff;
-    --bs-btn-bg: #6861ce;
-    --bs-btn-border-color: #6861ce;
+    --bs-btn-bg: #615fff;
+    --bs-btn-border-color: #615fff;
     --bs-btn-hover-color: #fff;
-    --bs-btn-hover-bg: #5c55bf;
-    --bs-btn-hover-border-color: #5c55bf;
+    --bs-btn-hover-bg: #4f39f6;
+    --bs-btn-hover-border-color: #4f39f6;
     --bs-btn-focus-shadow-rgb: 49, 132, 253;
     --bs-btn-active-color: #fff;
-    --bs-btn-active-bg: #5c55bf;
-    --bs-btn-active-border-color: #5c55bf;
+    --bs-btn-active-bg: #4f39f6;
+    --bs-btn-active-border-color: #4f39f6;
     --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
     --bs-btn-disabled-color: #fff;
-    --bs-btn-disabled-bg: #6861ce;
-    --bs-btn-disabled-border-color: #6861ce;
+    --bs-btn-disabled-bg: #615fff;
+    --bs-btn-disabled-border-color: #615fff;
 }
 
 .card-header {
@@ -58,16 +58,46 @@ body {
     vertical-align: middle;
 }
 
-.dataTables_length,
-.dataTables_filter {
-    padding-top: 5px;
-    padding-bottom: 20px;
+.table-light {
+    --bs-table-border-color: #dfe0e1;
 }
 
-.dataTables_info,
-.dataTables_paginate {
-    padding-top: 20px;
-    padding-bottom: 5px;
+.dt-length,
+.dt-search {
+    margin-bottom: 1rem !important;
+}
+
+.dt-info,
+.dt-paging {
+    margin-top: 1rem !important;
+    margin-bottom: .5rem !important;
+}
+
+.form-check-input:checked {
+  background-color: #615fff;
+  border-color: #615fff;
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange,
+.flatpickr-day.selected.inRange,
+.flatpickr-day.startRange.inRange,
+.flatpickr-day.endRange.inRange,
+.flatpickr-day.selected:focus,
+.flatpickr-day.startRange:focus,
+.flatpickr-day.endRange:focus,
+.flatpickr-day.selected:hover,
+.flatpickr-day.startRange:hover,
+.flatpickr-day.endRange:hover,
+.flatpickr-day.selected.prevMonthDay,
+.flatpickr-day.startRange.prevMonthDay,
+.flatpickr-day.endRange.prevMonthDay,
+.flatpickr-day.selected.nextMonthDay,
+.flatpickr-day.startRange.nextMonthDay,
+.flatpickr-day.endRange.nextMonthDay {
+  background: #615fff;
+  border-color: #615fff;
 }
 
 .flatpickr-day {
@@ -86,21 +116,37 @@ body {
 }
 
 .page-link:hover {
-    color: #6861ce;
+    color: #615fff;
     text-decoration: none;
     background-color: #fff;
-    border: 2px solid #6861ce;
+    border: 1px solid #615fff;
 }
 
 .page-item .page-link {
     margin: 0 7px;
+    border-radius: .25rem;
 }
 
 .page-item.active .page-link {
     z-index: 3;
     color: #fff;
     font-weight: 500;
-    background-color: #6861ce;
+    background-color: #615fff;
+}
+
+.page-item:first-child .page-link {
+    border-top-left-radius: .75rem;
+    border-bottom-left-radius: .75rem;
+    border-top-right-radius: .25rem;
+    border-bottom-right-radius: .25rem;
+}
+
+.page-item:last-child .page-link {
+    margin-right: 0;
+    border-top-right-radius: .75rem;
+    border-bottom-right-radius: .75rem;
+    border-top-left-radius: .25rem;
+    border-bottom-left-radius: .25rem;
 }
 
 .preloader {
@@ -132,10 +178,10 @@ body {
 }
 
 .footer .copyright a {
-    color: #ee5050;
+    color: #615fff;
     text-decoration: none;
 }
 
 .footer .copyright a:hover {
-    color: #eb2d2d;
+    color: #4f39f6;
 }

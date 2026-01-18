@@ -1,4 +1,7 @@
 <?php
+// Deklarasi strict types
+declare(strict_types=1);
+
 // pengecekan ajax request untuk mencegah direct access file, agar file tidak bisa diakses secara langsung dari browser
 // jika ada ajax request
 if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest')) {
@@ -12,7 +15,7 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && ($_SERVER['HTTP_X_REQUESTED_WITH
 
         // sql statement untuk menampilkan data dari tabel "tbl_siswa" berdasarkan "id_siswa"
         $query = $mysqli->query("SELECT * FROM tbl_siswa WHERE id_siswa='$id_siswa'")
-                                or die('Ada kesalahan pada query tampil data : ' . $mysqli->error);
+                                or die("Ada kesalahan pada query tampil data : {$mysqli->error}");
         // ambil data hasil query
         $data = $query->fetch_assoc();
 
@@ -23,5 +26,6 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && ($_SERVER['HTTP_X_REQUESTED_WITH
 // jika tidak ada ajax request
 else {
     // alihkan ke halaman index
-    header('location: index.php');
+    header('Location: index.php');
+    exit;
 }

@@ -1,3 +1,8 @@
+<?php
+// Deklarasi strict types
+declare(strict_types=1);
+?>
+
 <div class="d-flex flex-column flex-lg-row mt-5 mb-3">
     <!-- judul halaman -->
     <div class="flex-grow-1 d-flex align-items-center">
@@ -42,18 +47,18 @@
 </div>
 
 <!-- Modal form entri dan ubah data -->
-<div class="modal fade" id="mdl-form" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="mdl-label" aria-hidden="true">
+<div class="modal fade" id="modalInput" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <!-- judul form -->
                 <h1 class="modal-title fs-5">
-                    <i class="fa-solid fa-pen-to-square me-2"></i><span id="mdl-label"></span>
+                    <i class="fa-solid fa-pen-to-square me-2"></i><span id="modalLabel"></span>
                 </h1>
             </div>
-            <div class="modal-body text-start">
+            <div class="modal-body text-start p-4">
                 <!-- form -->
-                <form id="frm-siswa" enctype="multipart/form-data" class="needs-validation" novalidate>
+                <form id="formInput" enctype="multipart/form-data" class="needs-validation" novalidate>
                     <div class="row">
                         <div class="col-xl-6">
                             <div class="row g-0">
@@ -125,7 +130,7 @@
 
                             <div class="mb-3 pe-xl-3">
                                 <label class="form-label">WhatsApp <span class="text-danger">*</span></label>
-                                <input type="text" id="whatsapp" name="whatsapp" class="form-control" maxlength="13" autocomplete="off" onKeyPress="return goodchars(event,'0123456789',this)" required>
+                                <input type="text" id="whatsapp" name="whatsapp" class="form-control" maxlength="13" autocomplete="off" onkeydown="return allowChars(event, '0123456789')" required>
                                 <div class="invalid-feedback">WhatsApp tidak boleh kosong.</div>
                             </div>
                         </div>
@@ -133,11 +138,11 @@
                         <div class="col-xl-6">
                             <div class="mb-3 ps-xl-3">
                                 <label class="form-label">Foto Profil <span id="required" class="text-danger">*</span></label>
-                                <input type="file" accept=".jpg, .jpeg, .png" id="foto" name="foto" class="form-control" autocomplete="off">
+                                <input type="file" accept=".jpg, .jpeg, .png" id="image" name="foto" class="form-control" autocomplete="off">
                                 <div class="invalid-feedback">Foto profil tidak boleh kosong.</div>
 
                                 <div class="mt-4">
-                                    <img id="foto_preview" class="border border-2 img-fluid rounded-4 shadow-sm" alt="Foto Profil" width="240" height="240">
+                                    <img id="preview-image" class="border border-2 img-fluid rounded-4 shadow-sm" alt="Foto Profil" width="240" height="240">
                                 </div>
 
                                 <div class="form-text mt-4">
@@ -150,7 +155,7 @@
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer p-4">
                 <!-- button simpan data -->
                 <button id="btn-simpan" type="button" class="btn btn-primary rounded-pill py-2 px-4 me-2">Simpan</button>
                 <!-- button tutup modal form -->
@@ -161,7 +166,7 @@
 </div>
 
 <!-- Modal form detail data -->
-<div class="modal fade" id="mdl-form-detail" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="mdl-label" aria-hidden="true">
+<div class="modal fade" id="modalDetail" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
@@ -236,58 +241,43 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        /** Tampil Data
-         *****************
-        */
-        // DataTables plugin untuk membuat nomor urut tabel
-        $.fn.dataTableExt.oApi.fnPagingInfo = function(oSettings) {
-            return {
-                "iStart": oSettings._iDisplayStart,
-                "iEnd": oSettings.fnDisplayEnd(),
-                "iLength": oSettings._iDisplayLength,
-                "iTotal": oSettings.fnRecordsTotal(),
-                "iFilteredTotal": oSettings.fnRecordsDisplay(),
-                "iPage": Math.ceil(oSettings._iDisplayStart / oSettings._iDisplayLength),
-                "iTotalPages": Math.ceil(oSettings.fnRecordsDisplay() / oSettings._iDisplayLength)
-            };
-        };
-
+        /** Tampil Data */
         // Menampilkan data dengan datatables serverside processing
-        var table = $('#tabel-siswa').DataTable( {
+        var table = $('#tabel-siswa').DataTable({
             "processing": true,                     // tampilkan loading saat proses tampil data
             "serverSide": true,                     // aktifkan serverside processing
             "ajax": 'data.php',                     // file proses tampil data dari database
             // tampilkan data
             "columnDefs": [ 
-                { "targets": 0, "data": null, "orderable": false, "searchable": false, "width": '30px', "className": 'text-center' },
-                { "targets": 1, "width": "50px", "className": "text-center",
-                    "render": function ( data, type, row ) {
-                        var foto = "<img src=\"images/" + data + "\" class=\"border border-2 img-fluid rounded-3\" alt=\"Foto Profil\" width=\"70px\" height=\"70px\">";
-                        return foto;
+                { "targets": 0, "data": null, "orderable": false, "searchable": false, "width": '5%', "className": 'text-center' },
+                { "targets": 1, "width": "7%", "className": "text-center",
+                    "render": function (data, type, row) {
+                        return `<img src="images/${data}" class="border border-2 img-fluid rounded-3" alt="Foto Profil" width="70px" height="70px">`;
                     }
                 },
-                { "targets": 2, "width": "70px", "className": "text-center" },
-                { "targets": 3, "width": "200px" },
-                { "targets": 4, "width": "80px", "className": "text-center" },
-                { "targets": 5, "width": "80px", "className": "text-center" },
-                { "targets": 6, "width": "150px" },
-                { "targets": 7, "data": null, "orderable": false, "searchable": false, "width": '140px', "className": 'text-center',
+                { "targets": 2, "width": "8%", "className": "text-center" },
+                { "targets": 3, "width": "25%" },
+                { "targets": 4, "width": "10%", "className": "text-center" },
+                { "targets": 5, "width": "10%", "className": "text-center" },
+                { "targets": 6, "width": "16%" },
+                { "targets": 7, "data": null, "orderable": false, "searchable": false, "width": '16%', "className": 'text-center',
                     // button detail, ubah, dan hapus data
                     "render": function(data, type, row) {
-                        var btn = "<a class=\"btn btn-warning btn-sm rounded-pill px-3 me-2 mb-1 btn-detail\" href=\"javascript:void(0);\">Detail</a><a class=\"btn btn-primary btn-sm rounded-pill px-3 me-2 mb-1 btn-ubah\" href=\"javascript:void(0);\">Ubah</a><a class=\"btn btn-danger btn-sm rounded-pill px-3 mb-1 btn-hapus\" href=\"javascript:void(0);\">Hapus</a>";
-                        return btn;
+                        return `
+                            <a class="btn btn-warning btn-sm rounded-pill px-3 me-2 mb-1 btn-detail" href="javascript:void(0);">Detail</a>
+                            <a class="btn btn-primary btn-sm rounded-pill px-3 me-2 mb-1 btn-ubah" href="javascript:void(0);">Ubah</a>
+                            <a class="btn btn-danger btn-sm rounded-pill px-3 mb-1 btn-hapus" href="javascript:void(0);">Hapus</a>
+                        `;
                     } 
-                } 
+                }
             ],
             "order": [[ 2, "desc" ]],               // urutkan data berdasarkan "id_siswa" secara descending
             "iDisplayLength": 10,                   // tampilkan 10 data per halaman
             // membuat nomor urut tabel
-            "rowCallback": function (row, data, iDisplayIndex) {
-                var info   = this.fnPagingInfo();
-                var page   = info.iPage;
-                var length = info.iLength;
-                var index  = page * length + (iDisplayIndex + 1);
-                $('td:eq(0)', row).html(index);
+            "rowCallback": function(row, data, index) {
+                const pageInfo = table.page.info();
+                const rowNum = pageInfo.page * pageInfo.length + (index + 1);
+                $('td:eq(0)', row).html(rowNum);
             }
         } );
 
@@ -296,7 +286,6 @@
          * Form Entri Data
          * Form Detail Data
          * Form Ubah Data
-         * Validasi dan Preview File
         */
         // Menampilkan Modal Form Entri Data
         $('#btn-entri').click(function() {
@@ -306,33 +295,26 @@
                 // fungsi yang dijalankan sebelum ajax request dikirim
                 beforeSend: function() {
                     // tampilkan preloader
-                    $('.preloader').fadeIn('slow');
+                    $preloader.fadeIn('slow');
                 },
                 // fungsi yang dijalankan ketika ajax request berhasil
                 success: function(result) {
                     // memberikan interval waktu sebelum fungsi dijalankan
                     setTimeout(function() {
                         // tutup preloader
-                        $('.preloader').fadeOut('fast');
+                        $preloader.fadeOut('fast');
                         // tampilkan modal form
-                        $('#mdl-form').modal('show');
+                        $modalInput.modal('show');
                         // judul form
-                        $('#mdl-label').text('Entri Data Siswa');
+                        $modalLabel.text('Entri Data Siswa');
                         // reset form
-                        $('#frm-siswa')[0].reset();
-                        // hapus class was-validated pada form
-                        $("#frm-siswa").removeClass('was-validated');
-
-                        /** buat input foto wajib diisi */
-                        // hapus class d-none pada label Foto Profil
-                        $('#required').removeClass('d-none');
-                        // tambahkan attribute required pada input foto
-                        $('#foto').attr('required', true);
-
+                        resetForm();
+                        // buat input foto wajib diisi
+                        setPhotoRequired(true);
                         // tampilkan data "id_siswa"
                         $('#id_siswa').val(result);
                         // tampilkan foto default
-                        $('#foto_preview').attr('src','images/img-default.png');
+                        $previewImage.attr('src', 'images/img-default.png');
                     }, 500);
                 }
             });
@@ -354,32 +336,26 @@
                 // fungsi yang dijalankan sebelum ajax request dikirim
                 beforeSend: function() {
                     // tampilkan preloader
-                    $('.preloader').fadeIn('slow');
+                    $preloader.fadeIn('slow');
                 },
                 // fungsi yang dijalankan ketika ajax request berhasil
                 success: function(result) {
                     // memberikan interval waktu sebelum fungsi dijalankan
                     setTimeout(function() {
                         // tutup preloader
-                        $('.preloader').fadeOut('fast');
+                        $preloader.fadeOut('fast');
                         // tampilkan modal form
-                        $('#mdl-form-detail').modal('show');
+                        $modalDetail.modal('show');
 
-                        // ubah format tanggal menjadi Hari-Bulan-Tahun (d-m-Y) sebelum ditampilkan ke form
-                        var tanggal        = result.tanggal_daftar;
-                        var dateArray      = tanggal.split('-');
-                        var tanggal_daftar = dateArray[2] + '-' + dateArray[1] + '-' + dateArray[0];
-
-                        // tampilkan data ke form
-                        $('#dt_id_siswa').text(result.id_siswa);
-                        $('#dt_tanggal_daftar').text(tanggal_daftar);
-                        $('#dt_kelas').text(result.kelas);
-                        $('#dt_nama_lengkap').text(result.nama_lengkap);
-                        $('#dt_jenis_kelamin').text(result.jenis_kelamin);
-                        $('#dt_alamat').text(result.alamat);
-                        $('#dt_email').text(result.email);
-                        $('#dt_whatsapp').text(result.whatsapp);
-                        $('#dt_foto').attr('src','images/'+result.foto_profil);
+                        $('#dt_id_siswa').text(escapeHtml(result.id_siswa));
+                        $('#dt_tanggal_daftar').text(formatTanggalIndo(result.tanggal_daftar));
+                        $('#dt_kelas').text(escapeHtml(result.kelas));
+                        $('#dt_nama_lengkap').text(escapeHtml(result.nama_lengkap));
+                        $('#dt_jenis_kelamin').text(escapeHtml(result.jenis_kelamin));
+                        $('#dt_alamat').text(escapeHtml(result.alamat));
+                        $('#dt_email').text(escapeHtml(result.email));
+                        $('#dt_whatsapp').text(escapeHtml(result.whatsapp));
+                        $('#dt_foto').attr('src', `images/${result.foto_profil}`);
                     }, 500);
                 }
             });
@@ -401,116 +377,43 @@
                 // fungsi yang dijalankan sebelum ajax request dikirim
                 beforeSend: function() {
                     // tampilkan preloader
-                    $('.preloader').fadeIn('slow');
+                    $preloader.fadeIn('slow');
                 },
                 // fungsi yang dijalankan ketika ajax request berhasil
                 success: function(result) {
                     // memberikan interval waktu sebelum fungsi dijalankan
                     setTimeout(function() {
                         // tutup preloader
-                        $('.preloader').fadeOut('fast');
+                        $preloader.fadeOut('fast');
                         // tampilkan modal form
-                        $('#mdl-form').modal('show');
+                        $modalInput.modal('show');
                         // judul form
-                        $('#mdl-label').text('Ubah Data Siswa');
+                        $modalLabel.text('Ubah Data Siswa');
                         // hapus class was-validated pada form
-                        $("#frm-siswa").removeClass('was-validated');
+                        $formInput.removeClass('was-validated');
                         // reset input foto
-                        $('#foto').val('');
-
-                        /** buat input foto tidak wajib diisi */
-                        // tambahkan class d-none pada label Foto Profil
-                        $('#required').addClass('d-none');
-                        // hapus attribute required pada input foto
-                        $('#foto').removeAttr('required');
+                        $imageInput.val('');
+                        // buat input foto tidak wajib diisi
+                        setPhotoRequired(false);
 
                         // ubah format tanggal menjadi Hari-Bulan-Tahun (d-m-Y) sebelum ditampilkan ke form
-                        var tanggal        = result.tanggal_daftar;
-                        var dateArray      = tanggal.split('-');
-                        var tanggal_daftar = dateArray[2] + '-' + dateArray[1] + '-' + dateArray[0];
+                        const tanggal_daftar = formatDate(result.tanggal_daftar, true);
 
                         // tampilkan data ke form
                         $('#id_siswa').val(result.id_siswa);
                         $('#tanggal_daftar').val(tanggal_daftar);
                         $('#kelas').val(result.kelas);
                         $('#nama_lengkap').val(result.nama_lengkap);
-                        // checked radio button "jenis_kelamin" sesuai data dari database 
-                        var jenis_kelamin = $('input:radio[name=jenis_kelamin]');
-                        // jika "jenis_kelamin = Laki-laki"
-                        if (result.jenis_kelamin == 'Laki-laki'){
-                            jenis_kelamin.filter('[value=Laki-laki]').prop('checked', true);
-                        } 
-                        // jika "jenis_kelamin = Perempuan"
-                        else if (result.jenis_kelamin == 'Perempuan'){
-                            jenis_kelamin.filter('[value=Perempuan]').prop('checked', true);
-                        }
+                        setJenisKelamin(result.jenis_kelamin);
                         $('#alamat').val(result.alamat);
                         $('#email').val(result.email);
                         $('#whatsapp').val(result.whatsapp);
-                        $('#foto_preview').attr('src','images/'+result.foto_profil);
+                        $previewImage.attr('src', `images/${result.foto_profil}`);
+            
+                        formChanged = false;
                     }, 500);
                 }
             });
-        });
-
-        // Validasi file dan preview foto sebelum diunggah
-        $('#foto').change(function() {
-            // mengambil value dari file
-            var filePath = $('#foto').val();
-            var fileSize = $('#foto')[0].files[0].size;
-            // tentukan extension file yang diperbolehkan
-            var allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
-
-            // Jika tipe file yang diunggah tidak sesuai dengan "allowedExtensions"
-            if (!allowedExtensions.exec(filePath)) {
-                // tampilkan pesan peringatan tipe file tidak sesuai
-                $.notify({
-                    title: '<h5 class="font-weight-bold mb-1"><i class="fas fa-exclamation-triangle me-2"></i>Peringatan!</h5>',
-                    message: 'Tipe file foto tidak sesuai. Harap unggah file foto yang memiliki tipe *.jpg atau *.png.'
-                }, {
-                    type: 'warning',
-		            allow_dismiss: false,
-                });
-                // reset input file
-                $('#foto').val('');
-                // tampilkan file default
-                $('#foto_preview').attr('src', 'images/img-default.png');
-
-                return false;
-            }
-            // jika ukuran file yang diunggah lebih dari 1 Mb
-            else if (fileSize > 1000000) {
-                // tampilkan pesan peringatan ukuran file tidak sesuai
-                $.notify({
-                    title: '<h5 class="font-weight-bold mb-1"><i class="fas fa-exclamation-triangle me-2"></i>Peringatan!</h5>',
-                    message: 'Ukuran file foto lebih dari 1 Mb. Harap unggah file foto yang memiliki ukuran maksimal 1 Mb.'
-                }, {
-                    type: 'warning',
-		            allow_dismiss: false,
-                });
-                // reset input file
-                $('#foto').val('');
-                // tampilkan file default
-                $('#foto_preview').attr('src', 'images/img-default.png');
-
-                return false;
-            }
-            // jika file yang diunggah sudah sesuai, tampilkan preview file
-            else {
-                // mengambil value dari file
-                var fileInput = $('#foto')[0];
-
-                if (fileInput.files && fileInput.files[0]) {
-                    var reader = new FileReader();
-
-                    reader.onload = function(e) {
-                        // preview file
-                        $('#foto_preview').attr('src', e.target.result);
-                    };
-                };
-                // membaca file sebagai data URL
-                reader.readAsDataURL(fileInput.files[0]);
-            }
         });
 
         /** Proses
@@ -523,7 +426,7 @@
         $('#btn-simpan').click(function() {
             // validasi form input
             // jika ada input (required) yang kosong
-            if ($("#frm-siswa")[0].checkValidity() === false) {
+            if ($formInput[0].checkValidity() === false) {
                 // batalkan submit form
                 event.preventDefault()
                 event.stopPropagation()
@@ -531,7 +434,7 @@
             // jika tidak ada input (required) yang kosong, jalankan perintah insert / update data
             else {
                 // jika form entri data siswa yang ditampilkan, jalankan perintah insert
-                if ($('#mdl-label').text() == "Entri Data Siswa") {
+                if ($modalLabel.text() == "Entri Data Siswa") {
                     // ambil data hasil submit dari form dan buat variabel untuk menampung data menggunakan "FormData"
                     var data = new FormData();
                     data.append('id_siswa', $('#id_siswa').val());
@@ -542,7 +445,7 @@
                     data.append('alamat', $('#alamat').val());
                     data.append('email', $('#email').val());
                     data.append('whatsapp', $('#whatsapp').val());
-                    data.append('foto', $('#foto')[0].files[0]);
+                    data.append('foto', $imageInput[0].files[0]);
 
                     // ajax request untuk insert data siswa
                     $.ajax({
@@ -554,7 +457,7 @@
                         // fungsi yang dijalankan sebelum ajax request dikirim
                         beforeSend: function() {
                             // tampilkan preloader
-                            $('.preloader').fadeIn('slow');
+                            $preloader.fadeIn('slow');
                         },
                         // fungsi yang dijalankan ketika ajax request berhasil
                         success: function(result) {
@@ -563,17 +466,11 @@
                                 // memberikan interval waktu sebelum fungsi dijalankan
                                 setTimeout(function() {
                                     // tutup preloader
-                                    $('.preloader').fadeOut('fast');
+                                    $preloader.fadeOut('fast');
                                     // tutup modal form
-                                    $('#mdl-form').modal('hide');
+                                    $modalInput.modal('hide');
                                     // tampilkan pesan sukses simpan data
-                                    $.notify({
-                                        title: '<h5 class="font-weight-bold mb-1"><i class="fas fa-check-circle me-2"></i>Sukses!</h5>',
-                                        message: 'Data siswa berhasil disimpan.'
-                                    }, {
-                                        type: 'success',
-                                        allow_dismiss: false,
-                                    });
+                                    showNotify('success', 'Sukses!', 'Data siswa berhasil disimpan.');
                                     // reload data pada tabel
                                     var table = $('#tabel-siswa').DataTable();
                                     table.ajax.reload(null, false);
@@ -584,15 +481,9 @@
                                 // memberikan interval waktu sebelum fungsi dijalankan
                                 setTimeout(function() {
                                     // tutup preloader
-                                    $('.preloader').fadeOut('fast');
+                                    $preloader.fadeOut('fast');
                                     // tampilkan pesan gagal dan error result
-                                    $.notify({
-                                        title: '<h5 class="font-weight-bold mb-1"><i class="fas fa-times-circle me-2"></i>Gagal!</h5>',
-                                        message: 'Query Error : ' + result
-                                    }, {
-                                        type: 'danger',
-                                        allow_dismiss: false,
-                                    });
+                                    showNotify('danger', 'Gagal!', 'Query Error: ' + error);
                                 }, 500);
                             }
                         }
@@ -600,7 +491,7 @@
                     return false;
                 }
                 // jika form ubah data siswa yang ditampilkan, jalankan perintah update
-                else if ($('#mdl-label').text() == "Ubah Data Siswa") {
+                else if ($modalLabel.text() == "Ubah Data Siswa") {
                     // ambil data hasil submit dari form dan buat variabel untuk menampung data menggunakan "FormData"
                     var data = new FormData();
                     data.append('id_siswa', $('#id_siswa').val());
@@ -611,7 +502,7 @@
                     data.append('alamat', $('#alamat').val());
                     data.append('email', $('#email').val());
                     data.append('whatsapp', $('#whatsapp').val());
-                    data.append('foto', $('#foto')[0].files[0]);
+                    data.append('foto', $imageInput[0].files[0]);
 
                     // ajax request untuk update data siswa
                     $.ajax({
@@ -623,7 +514,7 @@
                         // fungsi yang dijalankan sebelum ajax request dikirim
                         beforeSend: function() {
                             // tampilkan preloader
-                            $('.preloader').fadeIn('slow');
+                            $preloader.fadeIn('slow');
                         },
                         // fungsi yang dijalankan ketika ajax request berhasil
                         success: function(result) {
@@ -632,17 +523,11 @@
                                 // memberikan interval waktu sebelum fungsi dijalankan
                                 setTimeout(function() {
                                     // tutup preloader
-                                    $('.preloader').fadeOut('fast');
+                                    $preloader.fadeOut('fast');
                                     // tutup modal form
-                                    $('#mdl-form').modal('hide');
+                                    $modalInput.modal('hide');
                                     // tampilkan pesan sukses ubah data
-                                    $.notify({
-                                        title: '<h5 class="font-weight-bold mb-1"><i class="fas fa-check-circle me-2"></i>Sukses!</h5>',
-                                        message: 'Data siswa berhasil diubah.'
-                                    }, {
-                                        type: 'success',
-                                        allow_dismiss: false,
-                                    });
+                                    showNotify('success', 'Sukses!', 'Data siswa berhasil diubah.');
                                     // reload data pada tabel
                                     var table = $('#tabel-siswa').DataTable();
                                     table.ajax.reload(null, false);
@@ -653,15 +538,9 @@
                                 // memberikan interval waktu sebelum fungsi dijalankan
                                 setTimeout(function() {
                                     // tutup preloader
-                                    $('.preloader').fadeOut('fast');
+                                    $preloader.fadeOut('fast');
                                     // tampilkan pesan gagal dan error result
-                                    $.notify({
-                                        title: '<h5 class="font-weight-bold mb-1"><i class="fas fa-times-circle me-2"></i>Gagal!</h5>',
-                                        message: 'Query Error : ' + result
-                                    }, {
-                                        type: 'danger',
-                                        allow_dismiss: false,
-                                    });
+                                    showNotify('danger', 'Gagal!', 'Query Error: ' + error);
                                 }, 500);
                             }
                         }
@@ -671,7 +550,7 @@
             }
 
             // tambahkan class was-validated pada form input saat form input sudah divalidasi
-            $("#frm-siswa").addClass('was-validated');
+            $formInput.addClass('was-validated');
         });
 
         // Proses Delete Data
@@ -682,7 +561,7 @@
             // tampilkan notifikasi saat akan menghapus data
             bootbox.dialog({
                 title: '<i class="fa-regular fa-trash-can me-2"></i> Hapus Data Siswa',
-                message: '<p class="mb-2">Anda yakin ingin menghapus data siswa?</p><p class="fw-bold mb-2">' + data[2] + ' - ' + data[3] + '</p>',
+                message: `<p class="mb-2">Anda yakin ingin menghapus data siswa?</p><p class="fw-bold mb-2">${escapeHtml(data[2])} - ${escapeHtml(data[3])}</p>`,
                 closeButton: false,
                 buttons: {
                     cancel: {
@@ -704,7 +583,7 @@
                                 // fungsi yang dijalankan sebelum ajax request dikirim
                                 beforeSend: function() {
                                     // tampilkan preloader
-                                    $('.preloader').fadeIn('slow');
+                                    $preloader.fadeIn('slow');
                                 },
                                 // fungsi yang dijalankan ketika ajax request berhasil
                                 success: function(result) {
@@ -713,15 +592,9 @@
                                         // memberikan interval waktu sebelum fungsi dijalankan
                                         setTimeout(function() {
                                             // tutup preloader
-                                            $('.preloader').fadeOut('fast');
+                                            $preloader.fadeOut('fast');
                                             // tampilkan pesan sukses hapus data
-                                            $.notify({
-                                                title: '<h5 class="font-weight-bold mb-1"><i class="fas fa-check-circle me-2"></i>Sukses!</h5>',
-                                                message: 'Data siswa berhasil dihapus.'
-                                            }, {
-                                                type: 'success',
-                                                allow_dismiss: false,
-                                            });
+                                            showNotify('success', 'Sukses!', 'Data siswa berhasil dihapus.');
                                             // reload data pada tabel
                                             var table = $('#tabel-siswa').DataTable();
                                             table.ajax.reload(null, false);
@@ -732,15 +605,9 @@
                                         // memberikan interval waktu sebelum fungsi dijalankan
                                         setTimeout(function() {
                                             // tutup preloader
-                                            $('.preloader').fadeOut('fast');
+                                            $preloader.fadeOut('fast');
                                             // tampilkan pesan gagal dan error result
-                                            $.notify({
-                                                title: '<h5 class="font-weight-bold mb-1"><i class="fas fa-times-circle me-2"></i>Gagal!</h5>',
-                                                message: 'Query Error : ' + result
-                                            }, {
-                                                type: 'danger',
-                                                allow_dismiss: false,
-                                            });
+                                            showNotify('danger', 'Gagal!', 'Query Error: ' + error);
                                         }, 500);
                                     }
                                 }

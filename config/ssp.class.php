@@ -1,4 +1,6 @@
 <?php
+// Deklarasi strict types
+declare(strict_types=1);
 
 /*
  * Helper functions for building a DataTables server-side processing SQL query
@@ -9,14 +11,14 @@
  * processing, they are intentionally simple to show how it works. More complex
  * server-side processing operations will likely require a custom script.
  *
- * See http://datatables.net/usage/server-side for full details on the server-
+ * See https://datatables.net/usage/server-side for full details on the server-
  * side processing requirements of DataTables.
  *
- * @license MIT - http://datatables.net/license_mit
+ * @license MIT - https://datatables.net/license_mit
  */
 
 
-// Please Remove below 4 lines as this is use in Datatatables test environment for your local or live environment please remove it or else it will not work
+// Please Remove below 4 lines as this is use in DataTables test environment for your local or live environment please remove it or else it will not work
 $file = $_SERVER['DOCUMENT_ROOT'].'/datatables/pdo.php';
 if ( is_file( $file ) ) {
 	include( $file );
@@ -33,10 +35,10 @@ class SSP {
 	 */
 	static function data_output ( $columns, $data )
 	{
-		$out = array();
+		$out = [];
 
-		for ( $i=0, $ien=count($data) ; $i<$ien ; $i++ ) {
-			$row = array();
+		for ( $i=0, $iLen=count($data) ; $i<$iLen ; $i++ ) {
+			$row = [];
 
 			for ( $j=0, $jen=count($columns) ; $j<$jen ; $j++ ) {
 				$column = $columns[$j];
@@ -72,14 +74,14 @@ class SSP {
 	 *
 	 * Obtain an PHP PDO connection from a connection details array
 	 *
-	 *  @param  array $conn SQL connection details. The array should have
+	 *  @param  mixed $conn SQL connection details. The array should have
 	 *    the following properties
 	 *     * host - host name
 	 *     * db   - database name
 	 *     * user - user name
 	 *     * pass - user password
 	 *     * Optional: `'charset' => 'utf8'` - you might need this depending on your PHP / MySQL config
-	 *  @return resource PDO connection
+	 *  @return PDO PDO connection
 	 */
 	static function db ( $conn )
 	{
@@ -126,14 +128,18 @@ class SSP {
 		$order = '';
 
 		if ( isset($request['order']) && count($request['order']) ) {
-			$orderBy = array();
+			$orderBy = [];
 			$dtColumns = self::pluck( $columns, 'dt' );
 
-			for ( $i=0, $ien=count($request['order']) ; $i<$ien ; $i++ ) {
-				// Convert the column index into the column data property
+			for ( $i=0, $iLen=count($request['order']) ; $i<$iLen ; $i++ ) {
 				$columnIdx = intval($request['order'][$i]['column']);
-				$requestColumn = $request['columns'][$columnIdx];
 
+				// Make sure that a valid column index was submitted
+				if (! isset($request['columns'][$columnIdx])) {
+					continue;
+				}
+
+				$requestColumn = $request['columns'][$columnIdx];
 				$columnIdx = array_search( $requestColumn['data'], $dtColumns );
 				$column = $columns[ $columnIdx ];
 
@@ -172,14 +178,14 @@ class SSP {
 	 */
 	static function filter ( $request, $columns, &$bindings )
 	{
-		$globalSearch = array();
-		$columnSearch = array();
+		$globalSearch = [];
+		$columnSearch = [];
 		$dtColumns = self::pluck( $columns, 'dt' );
 
 		if ( isset($request['search']) && $request['search']['value'] != '' ) {
 			$str = $request['search']['value'];
 
-			for ( $i=0, $ien=count($request['columns']) ; $i<$ien ; $i++ ) {
+			for ( $i=0, $iLen=count($request['columns']) ; $i<$iLen ; $i++ ) {
 				$requestColumn = $request['columns'][$i];
 				$columnIdx = array_search( $requestColumn['data'], $dtColumns );
 				$column = $columns[ $columnIdx ];
@@ -195,7 +201,7 @@ class SSP {
 
 		// Individual column filtering
 		if ( isset( $request['columns'] ) ) {
-			for ( $i=0, $ien=count($request['columns']) ; $i<$ien ; $i++ ) {
+			for ( $i=0, $iLen=count($request['columns']) ; $i<$iLen ; $i++ ) {
 				$requestColumn = $request['columns'][$i];
 				$columnIdx = array_search( $requestColumn['data'], $dtColumns );
 				$column = $columns[ $columnIdx ];
@@ -203,7 +209,7 @@ class SSP {
 				$str = $requestColumn['search']['value'];
 
 				if ( $requestColumn['searchable'] == 'true' &&
-				 $str != '' ) {
+				 $str != '' && is_string(($str)) ) {
 					if(!empty($column['db'])){
 						$binding = self::bind( $bindings, '%'.$str.'%', PDO::PARAM_STR );
 						$columnSearch[] = "`".$column['db']."` LIKE ".$binding;
@@ -249,7 +255,7 @@ class SSP {
 	 */
 	static function simple ( $request, $conn, $table, $primaryKey, $columns )
 	{
-		$bindings = array();
+		$bindings = [];
 		$db = self::db( $conn );
 
 		// Allow for a JSON string to be passed in
@@ -281,6 +287,7 @@ class SSP {
 
 		// Total data set length
 		$resTotalLength = self::sql_exec( $db,
+			[],
 			"SELECT COUNT(`{$primaryKey}`)
 			 FROM   `$table`"
 		);
@@ -289,14 +296,14 @@ class SSP {
 		/*
 		 * Output
 		 */
-		return array(
+		return [
 			"draw"            => isset ( $request['draw'] ) ?
 				intval( $request['draw'] ) :
 				0,
 			"recordsTotal"    => intval( $recordsTotal ),
 			"recordsFiltered" => intval( $recordsFiltered ),
 			"data"            => self::data_output( $columns, $data )
-		);
+		];
 	}
 
 
@@ -338,8 +345,8 @@ class SSP {
 		$whereResult=null,
 		$whereAll=null
 	) {
-		$bindings = array();
-		$whereAllBindings = array();
+		$bindings = [];
+		$whereAllBindings = [];
 		$db = self::db( $conn );
 		$whereAllSql = '';
 
@@ -375,6 +382,7 @@ class SSP {
 
 				if ( isset($whereAll['bindings']) ) {
 					self::add_bindings($whereAllBindings, $whereAll['bindings']);
+					$bindings = array_merge($bindings, $whereAllBindings);
 				}
 			}
 
@@ -413,14 +421,14 @@ class SSP {
 		/*
 		 * Output
 		 */
-		return array(
+		return [
 			"draw"            => isset ( $request['draw'] ) ?
 				intval( $request['draw'] ) :
 				0,
 			"recordsTotal"    => intval( $recordsTotal ),
 			"recordsFiltered" => intval( $recordsFiltered ),
 			"data"            => self::data_output( $columns, $data )
-		);
+		];
 	}
 
 
@@ -433,7 +441,7 @@ class SSP {
 	 *     * db   - database name
 	 *     * user - user name
 	 *     * pass - user password
-	 * @return resource Database connection handle
+	 * @return PDO Database connection handle
 	 */
 	static function sql_connect ( $sql_details )
 	{
@@ -442,7 +450,7 @@ class SSP {
 				"mysql:host={$sql_details['host']};dbname={$sql_details['db']}",
 				$sql_details['user'],
 				$sql_details['pass'],
-				array( PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION )
+				[ PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION ]
 			);
 		}
 		catch (PDOException $e) {
@@ -450,6 +458,7 @@ class SSP {
 				"An error occurred while connecting to the database. ".
 				"The error reported by the server was: ".$e->getMessage()
 			);
+			exit(0); // redundant, but PHPStan wants it.
 		}
 
 		return $db;
@@ -459,7 +468,7 @@ class SSP {
 	/**
 	 * Execute an SQL query on the database
 	 *
-	 * @param  resource $db  Database handler
+	 * @param  PDO $db  Database handler
 	 * @param  array    $bindings Array of PDO binding values from bind() to be
 	 *   used for safely escaping strings. Note that this can be given as the
 	 *   SQL query string if no bindings are required.
@@ -474,14 +483,11 @@ class SSP {
 		}
 
 		$stmt = $db->prepare( $sql );
-		//echo $sql;
 
 		// Bind parameters
-		if ( is_array( $bindings ) ) {
-			for ( $i=0, $ien=count($bindings) ; $i<$ien ; $i++ ) {
-				$binding = $bindings[$i];
-				$stmt->bindValue( $binding['key'], $binding['val'], $binding['type'] );
-			}
+		for ( $i=0, $iLen=count($bindings) ; $i<$iLen ; $i++ ) {
+			$binding = $bindings[$i];
+			$stmt->bindValue( $binding['key'], $binding['val'], $binding['type'] );
 		}
 
 		// Execute
@@ -511,9 +517,9 @@ class SSP {
 	 */
 	static function fatal ( $msg )
 	{
-		echo json_encode( array( 
+		echo json_encode( [ 
 			"error" => $msg
-		) );
+		] );
 
 		exit(0);
 	}
@@ -523,7 +529,7 @@ class SSP {
 	 * when executing a query with sql_exec()
 	 *
 	 * @param  array &$a    Array of bindings
-	 * @param  *      $val  Value to bind
+	 * @param  mixed  $val  Value to bind
 	 * @param  int    $type PDO field type
 	 * @return string       Bound key to be used in the SQL where this parameter
 	 *   would be used.
@@ -532,23 +538,23 @@ class SSP {
 	{
 		$key = ':binding_'.count( $a );
 
-		$a[] = array(
+		$a[] = [
 			'key' => $key,
 			'val' => $val,
 			'type' => $type
-		);
+		];
 
 		return $key;
 	}
 
 	static function add_bindings(&$a, $vals)
 	{
-		foreach($vals['bindings'] as $key => $value) {
-			$bindings[] = array(
+		foreach($vals as $key => $value) {
+			$a[] = [
 				'key' => $key,
 				'val' => $value,
 				'type' => PDO::PARAM_STR
-			);
+			];
 		}
 	}
 
@@ -563,7 +569,7 @@ class SSP {
 	 */
 	static function pluck ( $a, $prop )
 	{
-		$out = array();
+		$out = [];
 
 		for ( $i=0, $len=count($a) ; $i<$len ; $i++ ) {
  			if ( empty($a[$i][$prop]) && $a[$i][$prop] !== 0 ) {
@@ -591,10 +597,9 @@ class SSP {
 		if ( ! $a ) {
 			return '';
 		}
-		else if ( $a && is_array($a) ) {
+		else if ( is_array($a) ) {
 			return implode( $join, $a );
 		}
 		return $a;
 	}
 }
-
