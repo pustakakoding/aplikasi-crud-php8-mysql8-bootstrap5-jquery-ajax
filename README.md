@@ -2,8 +2,8 @@
 CRUD merupakan singkatan dari Create, Read, Update, dan Delete. Operasi CRUD merupakan operasi dasar yang harus diketahui oleh setiap programmer karena akan selalu digunakan dalam membangun sebuah sistem.
 
 Aplikasi ini dibangun dengan :
--	Menggunakan bahasa pemrograman PHP versi 8.
--	Menggunakan database management system MySQL versi 8.
+-	Menggunakan bahasa pemrograman PHP versi 8.5.
+-	Menggunakan database management system MySQL versi 8.4.
 -	Menggunakan MySQLi Extension untuk berkomunikasi dengan database.
 -	Menggunakan framework CSS Bootstrap 5 untuk membuat desain tampilan aplikasi.
 -	Menggunakan library JavaScript jQuery untuk memudahkan dan mempercepat dalam membuat website yang interaktif.
@@ -14,7 +14,7 @@ Aplikasi ini dibangun dengan :
 -	Menggunakan library Flatpickr untuk membuat datetime picker.
 -	Menggunakan Font Awesome untuk membuat icon yang menarik dengan sistem "Font Icon" (hanya menggunakan teks dan tanpa gambar).
 
-![pustakakoding-aplikasi-crud-php-mysql-bootstrap-jquery-ajax](https://github.com/pustakakoding/aplikasi-crud-php8-mysql8-bootstrap5-jquery-ajax/assets/88012593/c204afbe-7353-431f-b26e-56bfa0eadaa1)
+![Tampilan Aplikasi](https://github.com/pustakakoding/aplikasi-crud-php8-mysql8-bootstrap5-jquery-ajax/blob/main/pustakakoding-aplikasi-crud-php-mysql-bootstrap-jquery-ajax.webp)
 
 # Materi yang dapat dipelajari dari aplikasi ini adalah :
 
